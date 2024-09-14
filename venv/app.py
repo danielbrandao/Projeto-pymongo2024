@@ -128,14 +128,24 @@ def update_cliente(id_cliente):
 @app.route("/excluiCliente/<id_cliente>", methods=["DELETE"])
 def delete_cliente(id_cliente):
     try:
-        resultado = clientes_collection.delete_one(
-            {"_id": ObjectId(id_cliente)}
-        )
 
-        if resultado.deleted_count == 1:
-            return f"Cliente {id_cliente} excluido com sucesso.", 200
-        else:
-            return f"Cliente com id {id_cliente} não encontrado.", 404
+        # Converter id_cliente para inteiro (ajuste se necessário)
+        id_cliente = int(id_cliente)
+
+        # Buscar o documento utilizando o id_cliente personalizado
+        resultado_busca = clientes_collection.find_one({"id_cliente": id_cliente})
+
+        if resultado_busca:
+            _id = resultado_busca["_id"]
+
+            resultado = clientes_collection.delete_one(
+                {"_id": _id}
+            )
+
+            if resultado.deleted_count == 1:
+                return f"Cliente {id_cliente} excluido com sucesso.", 200
+            else:
+                return f"Cliente com id {id_cliente} não encontrado.", 404
 
     except Exception as e:
         return f"Erro ao excluir cliente: {e}", 500
