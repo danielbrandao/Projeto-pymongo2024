@@ -98,24 +98,29 @@ def set_cliente():
 @app.route("/alteraCliente/<id_cliente>", methods=["PUT"])
 def update_cliente(id_cliente):
     try:
-        resultado_busca = clientes_collection.find_one(
-            {"id_cliente": id_cliente}
-        )
-        if resultado_busca:
-            _id = resultado_busca['_id']
-            dados = request.get_json()
+        dados = request.get_json()
 
-            resultado = clientes_collection.update_one(
+        # Converter id_cliente para inteiro (ajuste se necessário)
+        id_cliente = int(id_cliente)
+
+        # Buscar o documento utilizando o id_cliente personalizado
+        resultado_busca = clientes_collection.find_one({"id_cliente": id_cliente})
+
+        if resultado_busca:
+            _id = resultado_busca["_id"]
+
+            # Atualiza o documento utilizando o _id
+            resultado_atualizacao = clientes_collection.update_one(
                 {"_id": _id},
                 {"$set": dados}
             )
 
-            if resultado.modified_count == 1:
+            if resultado_atualizacao.modified_count == 1:
                 return f"Cliente {id_cliente} atualizado com sucesso.", 200
             else:
-                return f"Cliente com id {id_cliente} não encontrado.", 404
+                return f"Erro ao atualizar cliente.", 500
         else:
-            return f"Cliente com id {id_cliente} não foi encontrato", 404
+            return f"Cliente com id {id_cliente} não encontrado.", 404
 
     except Exception as e:
         return f"Erro ao atualizar cliente: {e}", 500
